@@ -1,0 +1,41 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using UtlvteMonolito.Web.Data;
+using UtlvteMonolito.Web.Models;
+
+namespace UtlvteMonolito.Web.Controllers
+{
+    public class EstudiantesController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public EstudiantesController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var estudiantes = await _context.Estudiantes.ToListAsync();
+            return View(estudiantes);
+        }
+
+        public IActionResult Crear()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Crear([Bind("Cedula,Nombres,Apellidos,CorreoInstitucional,Carrera")] Estudiante estudiante)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(estudiante);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(estudiante);
+        }
+    }
+}
